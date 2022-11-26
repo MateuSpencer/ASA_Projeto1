@@ -69,9 +69,7 @@ int getNextInput(FILE *file_i){
 }
 
 
-
-
-
+//TODO Remove
 void print_map(int **ptr_map,int N_l,int N_c){
     int i,j;
     for(i=0;i<N_l; i++){
@@ -94,13 +92,17 @@ int main(int argc, char *argv[]){
     int n = 0, m = 0, sol = 0, line = -1;
     int **ptr_map = NULL; //double pointer for the map
     FILE *file_i = NULL;
-
+    /*
     if( argc == 2 ){
-        file_i = fopen("test.txt", "r"); //argv[1]
+        file_i = fopen(argv[1], "r"); //
     }else{
         return -1;
     }
-    
+    */
+
+    file_i = fopen("test.txt", "r"); //TODO - Remove
+
+
     n = getNextInput(file_i);
     m = getNextInput(file_i);
 
@@ -119,14 +121,17 @@ int main(int argc, char *argv[]){
             exit(0);
         }			
     }
-
-    while(val = getNextInput(file_i) != -1){
+    val = getNextInput(file_i);
+    while(val != -1){
         line++;
-        for(i = line; i <line ; i++)
-        ptr_map[val][i] = 1;
+        for(i = 0; i <val ; i++){
+            ptr_map[line][i] = 1;
+        }
+        val = getNextInput(file_i);
     }
 
-    print_map(ptr_map,n,m);
+    print_map(ptr_map,n,m);//TODO Remove
+    
 
     free_map(ptr_map, n);
     fclose(file_i);
