@@ -83,14 +83,25 @@ void print_map(int **ptr_map,int N_l,int N_c){
 }
 
 
+int place(int size ,int **ptr_map){
+    
+//placeTile()
+}
+
+/*
+mete o tile 1x1 no atnto esquerdo de baixo e ve se da
+se der - tentar meter um 2x2 etc
+
+*/
 
 
 
 int main(int argc, char *argv[]){
     
-    int i = 0, val = 0;
-    int n = 0, m = 0, sol = 0, line = -1;
-    int **ptr_map = NULL; //double pointer for the map
+    int i = 0, j = 0, k = 0, val = 0, max = 0;
+    int n = 0, m = 0, sol = 0, line = -1, totalTiles = 0;
+    int **map = NULL;
+    int **partial_map = NULL;
     FILE *file_i = NULL;
     /*
     if( argc == 2 ){
@@ -106,34 +117,74 @@ int main(int argc, char *argv[]){
     n = getNextInput(file_i);
     m = getNextInput(file_i);
 
-    ptr_map = (int**)calloc(n,sizeof(int*));
-    if(ptr_map == NULL){
+    map = (int**)calloc(n,sizeof(int*));
+    if(map == NULL){
         fprintf (stderr, "Error: not enough memory available");
         fclose(file_i);
         exit(0);
     }
     for(i=0; i < n; i++){
-        ptr_map[i] = (int*)calloc(m,sizeof(int));
-        if(ptr_map[i] == NULL){
-            free_map(ptr_map, i);
+        map[i] = (int*)calloc(m,sizeof(int));
+        if(map[i] == NULL){
+            free_map(map, i);
             fclose(file_i);
             fprintf (stderr, "Error: not enough memory available");
             exit(0);
         }			
     }
+
     val = getNextInput(file_i);
     while(val != -1){
         line++;
         for(i = 0; i <val ; i++){
-            ptr_map[line][i] = 1;
+            map[line][i] = 1;
+            totalTiles++;
         }
         val = getNextInput(file_i);
     }
-
-    print_map(ptr_map,n,m);//TODO Remove
-    
-
-    free_map(ptr_map, n);
+//DEVIA DELIMITAR O MAPA ATE ONDE ELE ACTAUALLY COMEÇA sem contar com celulas que nao podem ser tiled, e mudar o m e n
     fclose(file_i);
-    return sol;    
+
+    print_map(map,n,m);//TODO Remove
+    
+    partial_map = (int**)calloc(n,sizeof(int*));
+    if(partial_map == NULL){
+        fprintf (stderr, "Error: not enough memory available");
+        fclose(file_i);
+        exit(0);
+    }
+    for(i=0; i < n; i++){
+        partial_map[i] = (int*)calloc(m,sizeof(int));
+        if(partial_map[i] == NULL){
+            free_map(partial_map, i);
+            fclose(file_i);
+            fprintf (stderr, "Error: not enough memory available");
+            exit(0);
+        }			
+    }
+    if (n>m){
+        max = n;
+    }else{
+        max = m;
+    }
+    
+    partial_map[0][m] = 1 //number of possible tilings for a board with size 0 = 1
+    //criar array com as 2^m disposições que a linha pode ter
+    for (i = n; i > 0; i--) { //avança nas linhas da de baixo para a mais acima ---------------- ve la se os indices tao bem
+        for (j = 0; j < m; j++) { //avançar pelas 2^m disposições da linha e tentar meter peças tendo em conta a linha anterior?
+
+            dp[i][0] += dp[i - 1][7];// The number of empty states for this column is the number of full states in the previous column.
+
+            for (k = 2; k < max; k++) {
+                 //o que importa é tentar meter um de 2x2 ate max(m,n) x max(m,n)
+                //1x1 da sempre paar por 
+                
+            }
+        }
+    }
+
+
+    free_map(map, n);
+    free_map(partial_map, n);
+    return partial_map[][m];    
 }
