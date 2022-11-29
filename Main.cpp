@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <string.h>
+#include <math.h>
 
 //TODO
 /******************************************************************************
@@ -99,7 +101,7 @@ se der - tentar meter um 2x2 etc
 int main(int argc, char *argv[]){
     
     int i = 0, j = 0, k = 0, val = 0, max = 0;
-    int n = 0, m = 0, sol = 0, line = -1, totalTiles = 0;
+    int n = 0, m = 0, sol = 0, line = -1, totalTiles = 0, configurations = 0;
     int **map = NULL;
     int **partial_map = NULL;
     FILE *file_i = NULL;
@@ -142,11 +144,15 @@ int main(int argc, char *argv[]){
         }
         val = getNextInput(file_i);
     }
-//DEVIA DELIMITAR O MAPA ATE ONDE ELE ACTAUALLY COMEÇA sem contar com celulas que nao podem ser tiled, e mudar o m e n
+//TODO DEVIA DELIMITAR O MAPA ATE ONDE ELE ACTAUALLY COMEÇA sem contar com celulas que nao podem ser tiled, e mudar o m e n
     fclose(file_i);
 
-    print_map(map,n,m);//TODO Remove
+print_map(map,n,m);//TODO Remove
+
     
+    configurations = pow(2,m); //number of possible partial configuartions in a line to iterate through
+
+    //2D Array for Dynamic Programming Results
     partial_map = (int**)calloc(n,sizeof(int*));
     if(partial_map == NULL){
         fprintf (stderr, "Error: not enough memory available");
@@ -162,29 +168,31 @@ int main(int argc, char *argv[]){
             exit(0);
         }			
     }
+
+
     if (n>m){
         max = n;
     }else{
         max = m;
     }
     
-    partial_map[0][m] = 1 //number of possible tilings for a board with size 0 = 1
-    //criar array com as 2^m disposições que a linha pode ter
-    for (i = n; i > 0; i--) { //avança nas linhas da de baixo para a mais acima ---------------- ve la se os indices tao bem
-        for (j = 0; j < m; j++) { //avançar pelas 2^m disposições da linha e tentar meter peças tendo em conta a linha anterior?
-
-            dp[i][0] += dp[i - 1][7];// The number of empty states for this column is the number of full states in the previous column.
-
+    partial_map[0][configurations -1] = 1; //number of possible tilings for the first line (only one (with 1x1 tiles))
+    
+    for (i = n-2; i >= 0; i--) { //goes through all lines from the one above the last to the first one
+        partial_map[i][configurations -1] += partial_map[i - 1][configurations -1];// The number of valid configurations for this empty column is the same as the ones from the previous column  when full full
+        for (j = 0; j < configurations; j++) { //iterate through the 2^m possible configuartions in a line 
+            
+            partial_map[i][j] += partial_map[i-1][configurations -1]; // this partial configuartion is possible from the last full configuration by adding only 1x1 blocks at least
+            //Verificar se esta configuração ta dentro dos limites da escada?
             for (k = 2; k < max; k++) {
-                 //o que importa é tentar meter um de 2x2 ate max(m,n) x max(m,n)
-                //1x1 da sempre paar por 
-                
+                //Figure Out on each configuration, how many possible ways there are to reach it, given the previous line configuration wit all the possiblr pieces
+                //o que importa é tentar meter um de 2x2 ate max(m,n) x max(m,n)
+                //Acho que é preciso ter em conta nao so a linha anterior, mas se for uma peça lxl, l linhas anteriores
+                //might become unfiesable          
             }
         }
     }
-
-
     free_map(map, n);
     free_map(partial_map, n);
-    return partial_map[][m];    
+    return partial_map[0][configurations -1];    
 }
