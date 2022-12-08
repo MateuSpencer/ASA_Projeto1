@@ -166,9 +166,6 @@ e eu devia re fazewr todas as configurações nestas chamadas do solve pq podem 
         print_map(solutions,n,configurations);//TODO Remove
         for ( piece = 2; piece <= 2; piece++) { //n-line//try placing blocks from 2x2 to linexline
             for (top_configuration = 0; top_configuration < configurations; top_configuration++) {//iterate through the 2^m possible configuartions in a line
-                if(top_configuration == 31){
-                    top_configuration = 31;
-                }
                 if(log2(top_configuration) > map[line])break;
                 solutions[line][top_configuration] += last_line_result(solutions,line,configurations);
                 print_map(solutions,n,configurations);//TODO Remove 
@@ -184,6 +181,7 @@ e eu devia re fazewr todas as configurações nestas chamadas do solve pq podem 
                         top_consecutive_square = 0;
                     }
                     if(top_consecutive_square == piece){//see which botom configurations are compatible and then deal with the space left on the side if any
+                        //MEMOIZATION HERE: transformar esta configuração no numero de configuração, para so com os dois squares da peça e ver resultado?
                         top_consecutive_square = 1;
                         bottom_line = line+piece-1;
                         if(bottom_line_configuration == 0){
@@ -195,6 +193,9 @@ e eu devia re fazewr todas as configurações nestas chamadas do solve pq podem 
                                 }
                                 if(bottom_consecutive_space == piece){
                                     fits = 1;
+                                    //A COLOCAÇÃO DA SOLUÇA~DEVIA SER AQUI, PARA ITERAR POR TODAS AS CONFIGURAÇÕES DE BAIXO
+                                    //MAS DEPOIS COMO NAO REPETIR RESULTADOS?
+                                    //se for a ultima configuração, devia so ir ate meio+1?? das top configurations
                                     break;
                                 }
                             }
@@ -210,6 +211,9 @@ e eu devia re fazewr todas as configurações nestas chamadas do solve pq podem 
                             }
                         }
                         if(fits){
+                            if(top_configuration == 31){
+                            top_configuration = 31;
+                            }
                             fits = 0;
                             bottom_consecutive_space = 1;
                                 //TODO acho que este nao tem de tar aqui
@@ -217,13 +221,12 @@ e eu devia re fazewr todas as configurações nestas chamadas do solve pq podem 
                                 print_map(solutions,n,configurations);//TODO Remove
                                 if(first>0){//space on the left
                                     config = configuration_number(configuration_patterns, bottom_configuration,0, (first -1));
-                                    solutions[line][top_configuration] += solve(map,configuration_patterns,piece,first,config);
-                                }
+                                    solutions[line][top_configuration] += solve(map,configuration_patterns,piece,first,config);                                }
                                 if(first+piece < m){//passar espaço à esquerda
                                     config = configuration_number(configuration_patterns, bottom_configuration,first+piece, m-1);
-                                    solutions[line][top_configuration] += solve(map,configuration_patterns,piece,m-(first+piece),config);
-                                }
-                                
+                                    solutions[line][top_configuration] += solve(map,configuration_patterns,piece,m-(first+piece),config);                                }
+                                //estas resoluções deviam ter em conta o topo ? pq so querem cobrir o estado meio completo e nao necessariamente tudo?
+                                //ainda nao tenho memoization... mas preciso de estados intermedios sequer??
                                 print_map(solutions,n,configurations);//TODO Remove
                         }
                         first = -2;
