@@ -68,7 +68,7 @@ int board_configuration(int *arr, int size){
 }
 
 int solve(int *map, std::unordered_map<int, int>& solutions,  int n, int configuration){
-    int total = 0, right_top= 0, aux_line = 0, max_piece = 0, original_configuration = configuration;;
+    int total = 0, right_top= 0, aux_line = 0, max_piece = 0, skip = 0, original_configuration = configuration;;
     int *aux_map = NULL;
     //print_array(map,n);
 
@@ -78,7 +78,6 @@ int solve(int *map, std::unordered_map<int, int>& solutions,  int n, int configu
         free(aux_map);
         return 1;
     }
-
 
     if (solutions.find(configuration) != solutions.end()){
         free(aux_map);
@@ -90,25 +89,24 @@ int solve(int *map, std::unordered_map<int, int>& solutions,  int n, int configu
         max_piece ++;
     }
 
-
+    aux_map = (int*)calloc(n,sizeof(int));//novo mapa para passar recursivamente
     for(int piece = 1;piece <= max_piece; piece++){
-        aux_map = (int*)calloc(n,sizeof(int));//novo mapa para passar recursivamente
         for(aux_line = 0; aux_line < n; aux_line ++){//copy map to aux_map
             aux_map[aux_line] = map[aux_line];
         }
         for(aux_line = right_top; aux_line < (right_top + piece); aux_line++){ //retirar peça do mapa
             aux_map[aux_line] = aux_map[aux_line] - piece;
             if(aux_map[aux_line] < 0){//esta peça passa dos limites
-                free(aux_map);
-                aux_map = NULL;
+                skip = 1;
                 break;
             }
         }
-        if(aux_map != NULL){
+        if(skip == 0){
             //print_array(aux_map,n);
             configuration = board_configuration(aux_map,n);
             total += solve(aux_map,solutions,n, configuration);
         }else{
+            skip = 0;
             piece == max_piece+1;
         } 
     }
