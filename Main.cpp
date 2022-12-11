@@ -1,11 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <string.h>
-
 #include <string>
 #include <unordered_map>
-
 using namespace std;
 
 int find_right_top(int *arr, int size){
