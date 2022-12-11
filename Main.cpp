@@ -2,50 +2,11 @@
 #include <stdlib.h>
 
 #include <string.h>
+
+#include <string>
 #include <unordered_map>
 
-void free_map(int **ptr_map, int N_l){
-    int i = 0;
-    for (i=0; i < N_l; i++){
-        free(ptr_map[i]);		
-    }
-    free(ptr_map);
-}
-
-int concatenate(int a, int b){
-    char s1[10];
-    char s2[2];
-    sprintf(s1, "%d", a);
-    sprintf(s2, "%d", b);
-    strcat(s1, s2);
-    int c = atoi(s1);
-    return c;
-}
-
-int getNextInput(FILE *file_i){
-    char c = 0;
-    int i = 0,j = 0;
-    while (c<48 || 57<c){ //find the next numeric character
-        c = fgetc(file_i);
-        if (c == -1)return -1;//reached the end of the file
-    }
-    i = (c - 48);
-    c = fgetc(file_i);//get next numbers
-    while(c>=48 && c<=57){
-        j = (c - 48);
-        i = concatenate(i,j);
-        c = fgetc(file_i);
-    }
-    return i;
-}
-
-void print_array(int *arr, int size){
-    printf("\n");
-    for(int i=0; i<size; i++){
-        printf("%d",arr[i]);
-    }
-    printf("\n");
-}
+using namespace std;
 
 int find_right_top(int *arr, int size){
     int aux_line = 0, aux_right_top = 0, right_top = 0;
@@ -59,28 +20,27 @@ int find_right_top(int *arr, int size){
 return right_top;
 }
 
-int board_configuration(int *arr, int size){
-    int configuration = arr[0];
+string board_configuration(int *arr, int size){
+    string configuration = to_string(arr[0]);
     for(int i = 1; i < size; i++){
-        configuration = concatenate(configuration,arr[i]);
+        configuration = configuration + to_string(arr[i]);
     }
     return configuration;
 }
 
-int solve(int *map, std::unordered_map<int, int>& solutions,  int n, int configuration){
-    int total = 0, right_top= 0, aux_line = 0, max_piece = 0, skip = 0, original_configuration = configuration;;
+double solve(int *map, std::unordered_map<string, unsigned long long>& solutions,  int n, string configuration){
+    unsigned long long total = 0;
+    int right_top= 0, aux_line = 0, max_piece = 0, skip = 0;
+    string original_configuration = configuration;;
     int *aux_map = NULL;
-    //print_array(map,n);
 
     right_top = find_right_top(map,n);
     
     if( map[right_top] <= 1){//ja so é possivel configuração com 1x1s
-        free(aux_map);
         return 1;
     }
 
     if (solutions.find(configuration) != solutions.end()){
-        free(aux_map);
         return solutions[configuration];
     }
     
@@ -102,12 +62,11 @@ int solve(int *map, std::unordered_map<int, int>& solutions,  int n, int configu
             }
         }
         if(skip == 0){
-            //print_array(aux_map,n);
             configuration = board_configuration(aux_map,n);
             total += solve(aux_map,solutions,n, configuration);
         }else{
             skip = 0;
-            piece == max_piece+1;
+            piece = max_piece+1;
         } 
     }
     solutions[original_configuration] = total;
@@ -115,47 +74,45 @@ int solve(int *map, std::unordered_map<int, int>& solutions,  int n, int configu
     return total;
 }
 
+int input(){
+    int invalido = 1, val = 0;
+    while(invalido){
+        if(scanf("%d", &val) == 1){
+            invalido = 0;
+        }else{
+            scanf("%*s");
+        }
+    }
+    return val;
+}
 
 int main(int argc, char *argv[]){
-    int n = 0, m = 0,val = 0, line = -1, sol = 0;
+    int n = 0;
+    unsigned long long sol = 0;
     int *map = NULL;
-    FILE *file_i = NULL;
-    std::unordered_map<int, int> solutions;
-    /*
-    if( argc == 2 ){
-        file_i = fopen(argv[1], "r"); //
-    }else{
-        return -1;
-    }
-    */
+    std::unordered_map<string, unsigned long long> solutions;
 
-    file_i = fopen("test.txt", "r"); //TODO - Remove
-
-    n = getNextInput(file_i);
-    m = getNextInput(file_i);
+    n = input();
+    input();
 
     map = (int*)calloc(n,sizeof(int));
     if(map == NULL){
         fprintf (stderr, "Error: not enough memory available");
-        fclose(file_i);
         exit(0);
     }
 
-    val = getNextInput(file_i);
-    while(val != -1){
-        line++;
-        map[line] = val;
-        val = getNextInput(file_i);
+    for(int i = 0; i<n; i++){
+        map[i] = input();
     }
-    fclose(file_i);
 
-    print_array(map,n);
-
-    val = board_configuration(map,n);
-
-    sol = solve(map,solutions,n,val);
+    int right_top = find_right_top(map,n);
     
-    printf("\n%d",sol);
+    if( map[right_top] != 0){ //mapa vazio
+        string configuration = board_configuration(map,n);
+        sol = solve(map,solutions,n,configuration);
+    }
+    
+    printf("\n%llu",sol);
     free(map);
     return 1;    
 }
